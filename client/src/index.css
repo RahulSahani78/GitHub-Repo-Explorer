@@ -1,0 +1,160 @@
+@import 'tailwindcss';
+
+/* Enable class-based dark mode: `dark:` utilities activate under `.dark`. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Semantic design tokens. Values below are the LIGHT theme (emitted on :root by
+ * Tailwind). The `.dark` block further down overrides the same variables, so
+ * every `bg-surface` / `text-muted` / `border-border` utility becomes
+ * theme-aware automatically — no per-element dark: variants needed.
+ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-canvas: #f6f8fb;
+  --color-canvas-2: #eef1f6;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3f5f9;
+  --color-border: #e4e8ef;
+  --color-border-strong: #d3dae4;
+  --color-text: #0f172a;
+  --color-muted: #586273;
+  --color-faint: #8b95a6;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-soft: #dbe6ff;
+  --color-on-accent: #ffffff;
+
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.12);
+  --shadow-pop: 0 12px 40px -12px rgba(15, 23, 42, 0.25);
+}
+
+.dark {
+  --color-canvas: #0a0e15;
+  --color-canvas-2: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-2: #1d242d;
+  --color-border: #2a313b;
+  --color-border-strong: #3a424e;
+  --color-text: #e6edf3;
+  --color-muted: #9aa5b1;
+  --color-faint: #6b7682;
+  --color-accent: #4493f8;
+  --color-accent-hover: #62a6fa;
+  --color-accent-soft: #15233b;
+  --color-on-accent: #ffffff;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px -14px rgba(0, 0, 0, 0.7);
+  --shadow-pop: 0 16px 50px -16px rgba(0, 0, 0, 0.8);
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--color-canvas);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /* Soft ambient glow behind the app for a more premium feel. */
+  background-color: var(--color-canvas);
+  background-image:
+    radial-gradient(60rem 40rem at 50% -10%, color-mix(in oklab, var(--color-accent) 12%, transparent), transparent),
+    linear-gradient(var(--color-canvas), var(--color-canvas-2));
+  background-attachment: fixed;
+}
+
+/* Consistent, accessible focus ring for clickable elements. Inputs are excluded
+   on purpose — they show their own focus styling (a single accent border) via
+   their component classes, so they never get a second outline from here. */
+:where(a, button, [role='switch'], [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Tailwind v4 resets buttons to the default cursor — restore the pointer for
+   interactive controls so the whole app feels clickable. */
+button:not(:disabled),
+[role='button']:not(:disabled),
+[role='switch']:not(:disabled),
+label[for],
+summary {
+  cursor: pointer;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-accent) 30%, transparent);
+}
+
+/* Theme transition — gentle cross-fade when toggling light/dark. */
+.theme-transition,
+.theme-transition * {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Shimmer used by skeleton loaders. */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-surface-2);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0,
+    color-mix(in oklab, var(--color-text) 6%, transparent) 40%,
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fade-in-up 0.35s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .skeleton::after,
+  .animate-in {
+    animation: none;
+  }
+  .theme-transition,
+  .theme-transition * {
+    transition: none;
+  }
+}
